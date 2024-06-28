@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Make Reservation{% endblock %}
+
+{% block content %}
+<h1>Make Reservation</h1>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.showtime_id.label }}<br>
+        {{ form.showtime_id() }}<br>
+        {% for error in form.showtime_id.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+
+    <h3>Select Seats:</h3>
+    <div id="seat-map">
+        {% for row in seating_chart %}
+        <div class="seat-row">
+            {% for seat in row %}
+            <div class="seat {{ seat.status }}" data-seat="{{ seat.number }}">
+                {{ seat.number }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <input type="hidden" name="selected_seats" id="selected_seats">
+    <p>{{ form.submit() }}</p>
+</form>
+
+<script src="{{ url_for('static', filename='scripts/seat_selection.js') }}"></script>
+
+<style>
+    .seat-row {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 5px;
+    }
+    .seat {
+        width: 30px;
+        height: 30px;
+        margin: 3px;
+        background-color: green;
+        text-align: center;
+        line-height: 30px;
+        cursor: pointer;
+    }
+    .seat.selected {
+        background-color: red;
+    }
+    .seat.reserved {
+        background-color: gray;
+        cursor: not-allowed;
+    }
+</style>
+
+<div class="legend">
+    <div class="item">
+        <div class="color-box" style="background-color: green;"></div>
+        Available
+    </div>
+    <div class="item">
+        <div class="color-box" style="background-color: red;"></div>
+        Selected
+    </div>
+    <div class="item">
+        <div class="color-box" style="background-color: gray;"></div>
+        Reserved
+    </div>
+</div>
+{% endblock %}

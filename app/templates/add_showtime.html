@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Add Showtime{% endblock %}
+
+{% block content %}
+<h1>Add Showtime</h1>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.movie_id.label }}<br>
+        {{ form.movie_id() }}<br>
+        {% for error in form.movie_id.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.showtime.label }}<br>
+        {{ form.showtime() }}<br>
+        {% for error in form.showtime.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>{{ form.submit() }}</p>
+</form>
+{% endblock %}

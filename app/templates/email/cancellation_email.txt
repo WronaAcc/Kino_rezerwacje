@@ -1,0 +1,10 @@
+Dear {{ user.username }},
+
+Your reservation has been canceled.
+
+Details:
+- Movie: {{ reservation.showtime.movie.title }}
+- Showtime: {{ reservation.showtime.showtime }}
+- Seats: {{ reservation.seats }}
+
+We hope to see you again!

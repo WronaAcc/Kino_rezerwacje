@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}Cinema Reservation System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<header>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('movies') }}">Movies</a></li>
+            <li><a href="{{ url_for('make_reservation') }}">Make Reservation</a></li>
+            {% if current_user.is_authenticated %}
+            {% if current_user.is_admin %}
+            <li><a href="{{ url_for('add_movie') }}">Add Movie</a></li>
+            <li><a href="{{ url_for('add_showtime') }}">Add Showtime</a></li>
+            {% endif %}
+            <li><a href="{{ url_for('profile') }}">Profile</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+            <li><a href="{{ url_for('login') }}">Login</a></li>
+            <li><a href="{{ url_for('register') }}">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</header>
+<main>
+    {% block content %}{% endblock %}
+</main>
+</body>
+</html>

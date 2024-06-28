@@ -1,0 +1,12 @@
+<!doctype html>
+<html>
+<head>
+  <title>Reservation Confirmation</title>
+</head>
+<body>
+<p>Dear {{ user.username }},</p>
+<p>Your reservation for {{ reservation.showtime.movie.title }} on {{ reservation.showtime.showtime }} has been confirmed.</p>
+<p>Your ticket code is: {{ ticket_code }}</p>
+<p>Thank you for using our service.</p>
+</body>
+</html>

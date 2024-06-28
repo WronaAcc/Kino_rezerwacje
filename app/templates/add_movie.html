@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Add Movie{% endblock %}
+
+{% block content %}
+<h1>Add Movie</h1>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.title.label }}<br>
+        {{ form.title(size=32) }}<br>
+        {% for error in form.title.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.director.label }}<br>
+        {{ form.director(size=32) }}<br>
+        {% for error in form.director.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.release_date.label }}<br>
+        {{ form.release_date() }}<br>
+        {% for error in form.release_date.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.genre.label }}<br>
+        {{ form.genre(size=32) }}<br>
+        {% for error in form.genre.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.description.label }}<br>
+        {{ form.description(rows=4, cols=40) }}<br>
+        {% for error in form.description.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>{{ form.submit() }}</p>
+</form>
+{% endblock %}

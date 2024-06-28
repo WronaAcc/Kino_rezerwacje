@@ -1,0 +1,11 @@
+Dear {{ user.username }},
+
+Your reservation has been confirmed.
+
+Details:
+- Movie: {{ reservation.showtime.movie.title }}
+- Showtime: {{ reservation.showtime.showtime }}
+- Seats: {{ reservation.seats }}
+- Ticket Code: {{ ticket_code }}
+
+Thank you for your reservation!

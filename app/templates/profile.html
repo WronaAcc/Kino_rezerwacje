@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Profile</title>
+</head>
+<body>
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<h1>Profile</h1>
+<p>Username: {{ current_user.username }}</p>
+<p>Email: {{ current_user.email }}</p>
+
+<h2>My Reservations</h2>
+<ul>
+  {% for reservation in active_reservations %}
+  <li>
+    {{ reservation.showtime.movie.title }} - {{ reservation.showtime.showtime }} - Seats: {{ reservation.seats }}
+    <form action="{{ url_for('cancel_reservation', reservation_id=reservation.id) }}" method="POST" style="display:inline;">
+      {{ form.hidden_tag() }}
+      <input type="submit" value="Cancel">
+    </form>
+  </li>
+  {% else %}
+  <li>No upcoming reservations.</li>
+  {% endfor %}
+</ul>
+
+<h2>Past Reservations</h2>
+<ul>
+  {% for reservation in past_reservations %}
+  <li>
+    {{ reservation.showtime.movie.title }} - {{ reservation.showtime.showtime }} - Seats: {{ reservation.seats }}
+  </li>
+  {% else %}
+  <li>No past reservations.</li>
+  {% endfor %}
+</ul>
+
+<h2>Canceled Reservations</h2>
+<ul>
+  {% for reservation in canceled_reservations %}
+  <li>
+    {{ reservation.showtime.movie.title }} - {{ reservation.showtime.showtime }} - Seats: {{ reservation.seats }}
+  </li>
+  {% else %}
+  <li>No canceled reservations.</li>
+  {% endfor %}
+</ul>
+
+<p><a href="{{ url_for('change_password') }}">Change Password</a></p>
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Update Seat{% endblock %}
+
+{% block content %}
+<h1>Admin Update Seat</h1>
+<form method="POST">
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.seat_number.label }}<br>
+    {{ form.seat_number() }}<br>
+    {% for error in form.seat_number.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.status.label }}<br>
+    {{ form.status() }}<br>
+    {% for error in form.status.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>{{ form.submit() }}</p>
+</form>
+
+<h3>Seating Chart:</h3>
+<div id="seat-map">
+  {% for row in seating_chart %}
+  <div class="seat-row">
+    {% for seat in row %}
+    <div class="seat {{ seat.status }}" data-seat="{{ seat.number }}">
+      {{ seat.number }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+
+<style>
+  .seat-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px;
+  }
+  .seat {
+    width: 30px;
+    height: 30px;
+    margin: 3px;
+    background-color: green;
+    text-align: center;
+    line-height: 30px;
+    cursor: pointer;
+  }
+  .seat.selected {
+    background-color: red;
+  }
+  .seat.reserved {
+    background-color: gray;
+    cursor: not-allowed;
+  }
+  .seat.unavailable {
+    background-color: black;
+    cursor: not-allowed;
+  }
+  .legend {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  .legend .item {
+    margin-right: 20px;
+    display: flex;
+    align-items: center;
+  }
+  .legend .item .color-box {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+  }
+  .color-available {
+    background-color: green;
+  }
+  .color-selected {
+    background-color: red;
+  }
+  .color-reserved {
+    background-color: gray;
+  }
+  .color-unavailable {
+    background-color: black;
+  }
+</style>
+
+<div class="legend">
+  <div class="item">
+    <div class="color-box color-available"></div>
+    <span>Available</span>
+  </div>
+  <div class="item">
+    <div class="color-box color-selected"></div>
+    <span>Selected</span>
+  </div>
+  <div class="item">
+    <div class="color-box color-reserved"></div>
+    <span>Reserved</span>
+  </div>
+  <div class="item">
+    <div class="color-box color-unavailable"></div>
+    <span>Unavailable</span>
+  </div>
+</div>
+{% endblock %}
