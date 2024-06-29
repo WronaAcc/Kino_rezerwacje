@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1>Add Showtime</h1>
-<form method="POST">
+<form method="POST" action="{{ url_for('add_showtime') }}">
     {{ form.hidden_tag() }}
     <p>
         {{ form.movie_id.label }}<br>

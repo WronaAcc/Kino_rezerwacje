@@ -10,7 +10,9 @@ from datetime import datetime, timedelta
 import random
 import string
 import logging
+from flask_wtf.csrf import CSRFProtect, generate_csrf
 
+csrf = CSRFProtect(app)
 
 def generate_random_password(length=12):
     letters_and_digits = string.ascii_letters + string.digits
@@ -64,23 +66,34 @@ def register():
     return render_template('register.html', form=form)
 
 
+@app.route('/movies', methods=['GET'])
+@login_required
+def movies():
+    movies = Movie.query.all()
+    form_csrf_token = generate_csrf()
+    return render_template('movies.html', movies=movies, form_csrf_token=form_csrf_token)
+
 @app.route('/add_movie', methods=['GET', 'POST'])
 @login_required
 def add_movie():
     if not current_user.is_admin:
         flash('You do not have permission to perform this action.')
         return redirect(url_for('index'))
+
     form = MovieForm()
     if form.validate_on_submit():
-        movie = Movie(title=form.title.data, director=form.director.data,
-                      release_date=form.release_date.data, genre=form.genre.data,
-                      description=form.description.data)
+        movie = Movie(
+            title=form.title.data,
+            director=form.director.data,
+            release_date=form.release_date.data,
+            genre=form.genre.data,
+            description=form.description.data
+        )
         db.session.add(movie)
         db.session.commit()
         flash('Movie added successfully!')
-        return redirect(url_for('index'))
+        return redirect(url_for('movies'))
     return render_template('add_movie.html', form=form)
-
 
 @app.route('/add_showtime', methods=['GET', 'POST'])
 @login_required
@@ -88,18 +101,58 @@ def add_showtime():
     if not current_user.is_admin:
         flash('You do not have permission to perform this action.')
         return redirect(url_for('index'))
+
     form = ShowtimeForm()
     if form.validate_on_submit():
-        showtime = Showtime(movie_id=form.movie_id.data, showtime=form.showtime.data)
+        showtime = Showtime(
+            movie_id=form.movie_id.data,
+            showtime=form.showtime.data
+        )
         db.session.add(showtime)
         db.session.commit()
-
-        # Tworzenie miejsc dla nowego seansu
-        showtime.create_seats_for_showtime()
-
         flash('Showtime added successfully!')
-        return redirect(url_for('index'))
+        return redirect(url_for('movies'))
     return render_template('add_showtime.html', form=form)
+
+@app.route('/delete_movie/<int:movie_id>', methods=['POST'])
+@login_required
+def delete_movie(movie_id):
+    if not current_user.is_admin:
+        flash('Only administrators can delete movies.')
+        return redirect(url_for('index'))
+
+    movie = Movie.query.get_or_404(movie_id)
+    for showtime in movie.showtimes:
+        delete_showtime(showtime.id, bypass=True)
+    db.session.delete(movie)
+    db.session.commit()
+    flash('Movie deleted successfully.')
+    return redirect(url_for('movies'))
+
+@app.route('/delete_showtime/<int:showtime_id>', methods=['POST'])
+@login_required
+def delete_showtime(showtime_id, bypass=False):
+    if not current_user.is_admin and not bypass:
+        flash('Only administrators can delete showtimes.')
+        return redirect(url_for('index'))
+
+    showtime = Showtime.query.get_or_404(showtime_id)
+
+    # Usuwanie rezerwacji powiązanych z showtime'em
+    reservations = Reservation.query.filter_by(showtime_id=showtime_id).all()
+    for reservation in reservations:
+        db.session.delete(reservation)
+
+    # Usuwanie miejsc powiązanych z showtime'em
+    seats = Seat.query.filter_by(showtime_id=showtime_id).all()
+    for seat in seats:
+        db.session.delete(seat)
+
+    db.session.delete(showtime)
+    db.session.commit()
+    if not bypass:
+        flash('Showtime deleted successfully.')
+    return redirect(url_for('movies'))
 
 @app.route('/make_reservation', methods=['GET', 'POST'])
 @login_required
@@ -193,12 +246,6 @@ def admin_update_seat(showtime_id):
         seating_chart.append(seat_row)
 
     return render_template('admin_update_seat.html', form=form, seating_chart=seating_chart, showtime_id=showtime.id)
-
-
-@app.route('/movies')
-def movies():
-    all_movies = Movie.query.all()
-    return render_template('movies.html', movies=all_movies)
 
 
 @app.route('/reset_password_request', methods=['GET', 'POST'])
@@ -310,20 +357,6 @@ def update_movie(movie_id):
         return redirect(url_for('movies'))
     return render_template('add_movie.html', form=form)
 
-
-@app.route('/delete_movie/<int:movie_id>', methods=['POST'])
-@login_required
-def delete_movie(movie_id):
-    if not current_user.is_admin:
-        flash('You do not have permission to perform this action.')
-        return redirect(url_for('index'))
-    movie = Movie.query.get_or_404(movie_id)
-    db.session.delete(movie)
-    db.session.commit()
-    flash('Movie deleted successfully!')
-    return redirect(url_for('movies'))
-
-
 @app.route('/update_showtime/<int:showtime_id>', methods=['GET', 'POST'])
 @login_required
 def update_showtime(showtime_id):
@@ -338,20 +371,6 @@ def update_showtime(showtime_id):
         flash('Showtime updated successfully!')
         return redirect(url_for('index'))
     return render_template('add_showtime.html', form=form)
-
-
-@app.route('/delete_showtime/<int:showtime_id>', methods=['POST'])
-@login_required
-def delete_showtime(showtime_id):
-    if not current_user.is_admin:
-        flash('You do not have permission to perform this action.')
-        return redirect(url_for('index'))
-    showtime = Showtime.query.get_or_404(showtime_id)
-    db.session.delete(showtime)
-    db.session.commit()
-    flash('Showtime deleted successfully!')
-    return redirect(url_for('index'))
-
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required

@@ -7,27 +7,42 @@
 </head>
 <body>
 <header>
-    <nav>
-        <ul>
-            <li><a href="{{ url_for('index') }}">Home</a></li>
-            <li><a href="{{ url_for('movies') }}">Movies</a></li>
-            <li><a href="{{ url_for('make_reservation') }}">Make Reservation</a></li>
-            {% if current_user.is_authenticated %}
-            {% if current_user.is_admin %}
-            <li><a href="{{ url_for('add_movie') }}">Add Movie</a></li>
-            <li><a href="{{ url_for('add_showtime') }}">Add Showtime</a></li>
-            {% endif %}
-            <li><a href="{{ url_for('profile') }}">Profile</a></li>
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
-            {% else %}
-            <li><a href="{{ url_for('login') }}">Login</a></li>
-            <li><a href="{{ url_for('register') }}">Register</a></li>
-            {% endif %}
-        </ul>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <a href="{{ url_for('index') }}">NAZWA KINA</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('movies') }}">Movies</a></li>
+                <li><a href="{{ url_for('make_reservation') }}">Make Reservation</a></li>
+                {% if current_user.is_authenticated %}
+                {% if current_user.is_admin %}
+                <li><a href="{{ url_for('add_movie') }}">Add Movie</a></li>
+                <li><a href="{{ url_for('add_showtime') }}">Add Showtime</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
     </nav>
 </header>
-<main>
-    {% block content %}{% endblock %}
+<main class="container">
+    <div class="ads">
+        <div class="ad-left">Miejsce na reklamę</div>
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+        <div class="ad-right">Miejsce na reklamę</div>
+    </div>
 </main>
+<footer>
+    <p>&copy; 2024 Cinema Reservation System</p>
+</footer>
+<script src="{{ url_for('static', filename='scripts/seat_selection.js') }}"></script>
 </body>
 </html>
