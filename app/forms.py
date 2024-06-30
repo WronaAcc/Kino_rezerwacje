@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, TextAreaField, DateField, DateTimeField, HiddenField
-from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, TextAreaField, DateField, \
+    DateTimeField, HiddenField, IntegerField
+from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, NumberRange
 from .models import User, Showtime, Movie
 from datetime import datetime
 
@@ -80,7 +81,23 @@ class AdminUpdateSeatForm(FlaskForm):
     seat_number = StringField('Seat Number', validators=[DataRequired()])
     status = SelectField('Status', choices=[('available', 'Available'), ('reserved', 'Reserved'), ('excluded', 'Excluded')], validators=[DataRequired()])
     submit = SubmitField('Update Seat')
-
-
 class EmptyForm:
     pass
+
+# forms.py
+
+class RatingForm(FlaskForm):
+    score = SelectField('Rating', choices=[(i, i) for i in range(1, 6)], coerce=int)
+    submit = SubmitField('Submit Rating')
+
+class MovieFilterForm(FlaskForm):
+    title = StringField('Title')
+    genre = StringField('Genre')
+    release_date = DateField('Release Date', format='%Y-%m-%d')
+    director = StringField('Director')  # Dodajemy brakujący atrybut
+    score = IntegerField('Score')
+    submit = SubmitField('Filter')
+
+class SearchForm(FlaskForm):
+    search = StringField('Search', validators=[DataRequired()])
+    submit = SubmitField('Search')

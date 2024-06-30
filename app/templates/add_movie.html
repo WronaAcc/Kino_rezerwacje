@@ -110,7 +110,32 @@
     </style>
 </head>
 <body>
-<div class="container">
+<header>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <a href="{{ url_for('index') }}">NAZWA KINA</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('movies') }}">Movies</a></li>
+                <li><a href="{{ url_for('make_reservation') }}">Make Reservation</a></li>
+                {% if current_user.is_authenticated %}
+                {% if current_user.is_admin %}
+                <li><a href="{{ url_for('add_movie') }}">Add Movie</a></li>
+                <li><a href="{{ url_for('add_showtime') }}">Add Showtime</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+</header>
+<main class="container">
     <h1>Add Movie</h1>
     <form method="POST">
         {{ form.hidden_tag() }}
@@ -151,6 +176,9 @@
         </div>
         <button type="submit">{{ form.submit.label }}</button>
     </form>
-</div>
+</main>
+<footer>
+    <p>&copy; 2024 Cinema Reservation System</p>
+</footer>
 </body>
 </html>

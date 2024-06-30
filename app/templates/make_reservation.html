@@ -1,52 +1,99 @@
-{% extends "base.html" %}
-
-{% block title %}Make Reservation{% endblock %}
-
-{% block content %}
-<h1>Make Reservation</h1>
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <p>
-        {{ form.showtime_id.label }}<br>
-        {{ form.showtime_id() }}<br>
-        {% for error in form.showtime_id.errors %}
-        <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-
-    <h3>Select Seats:</h3>
-    <div id="seat-map">
-        <div id="screen">EKRAN</div>
-        {% for row in seating_chart %}
-        <div class="seat-row">
-            {% for seat in row %}
-            <div class="seat {{ seat.status }}" data-seat="{{ seat.number }}">
-                {{ seat.number }}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Make Reservation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <a href="{{ url_for('index') }}">NAZWA KINA</a>
             </div>
-            {% endfor %}
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('movies') }}">Movies</a></li>
+                <li><a href="{{ url_for('make_reservation') }}">Make Reservation</a></li>
+                {% if current_user.is_authenticated %}
+                {% if current_user.is_admin %}
+                <li><a href="{{ url_for('add_movie') }}">Add Movie</a></li>
+                <li><a href="{{ url_for('add_showtime') }}">Add Showtime</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+            <div class="toggle-dark-mode">
+                <div class="toggle-thumb"></div>
+                <i class="fas fa-sun icon icon-day"></i>
+                <i class="fas fa-moon icon icon-night"></i>
+            </div>
         </div>
-        {% endfor %}
+    </nav>
+</header>
+<main class="container">
+    <div class="ads">
+        <div class="ad-left">Miejsce na reklamę</div>
+        <div class="content">
+            <h1>Make Reservation</h1>
+            <form method="POST" id="reservation-form" action="{{ url_for('make_reservation') }}">
+                {{ form.hidden_tag() }}
+                <p>
+                    {{ form.showtime_id.label }}<br>
+                    {{ form.showtime_id() }}<br>
+                    {% for error in form.showtime_id.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+
+                <h3>Select Seats:</h3>
+                <div id="seat-map">
+                    <div id="screen">EKRAN</div>
+                    {% for row in seating_chart %}
+                    <div class="seat-row">
+                        {% for seat in row %}
+                        <div class="seat {{ seat.status }}" data-seat="{{ seat.number }}">
+                            {{ seat.number }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <input type="hidden" name="selected_seats" id="selected_seats">
+                <button type="submit">Make Reservation</button>
+                <button type="button" class="back-button" onclick="window.location.href='{{ url_for('index') }}'">Wróć</button>
+            </form>
+
+            <div class="legend">
+                <div class="item">
+                    <div class="color-box color-available"></div>
+                    Miejsca dostępne
+                </div>
+                <div class="item">
+                    <div class="color-box color-selected"></div>
+                    Wybrane miejsca
+                </div>
+                <div class="item">
+                    <div class="color-box color-reserved"></div>
+                    Miejsca niedostępne
+                </div>
+            </div>
+        </div>
+        <div class="ad-right">Miejsce na reklamę</div>
     </div>
-
-    <input type="hidden" name="selected_seats" id="selected_seats">
-    <button type="submit">Make Reservation</button>
-    <button type="button" class="back-button" onclick="window.location.href='{{ url_for('index') }}'">Wróć</button>
-</form>
-
+</main>
+<footer>
+    <p>&copy; 2024 Cinema Reservation System</p>
+</footer>
 <script src="{{ url_for('static', filename='scripts/seat_selection.js') }}"></script>
-
-<div class="legend">
-    <div class="item">
-        <div class="color-box color-available"></div>
-        Miejsca dostępne
-    </div>
-    <div class="item">
-        <div class="color-box color-selected"></div>
-        Wybrane miejsca
-    </div>
-    <div class="item">
-        <div class="color-box color-reserved"></div>
-        Miejsca niedostępne
-    </div>
-</div>
-{% endblock %}
+<script src="{{ url_for('static', filename='scripts/reservation_confirmation.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/dark_mode.js') }}"></script>
+</body>
+</html>

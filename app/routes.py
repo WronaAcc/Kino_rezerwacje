@@ -1,9 +1,10 @@
-from flask import render_template, flash, redirect, url_for, request, current_app as app, current_app
+from flask import render_template, flash, redirect, url_for, request, current_app as app, current_app, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from . import db
-from .models import User, Movie, Showtime, Reservation, Seat
+from .helpers import calculate_loyalty_points, recommend_movies
+from .models import User, Movie, Showtime, Reservation, Seat, Rating, LoyaltyPoint
 from .forms import LoginForm, RegistrationForm, MovieForm, ShowtimeForm, ReservationForm, ResetPasswordRequestForm, \
-    ResetPasswordForm, ChangePasswordForm, EditProfileForm, AdminUpdateSeatForm
+    ResetPasswordForm, ChangePasswordForm, EditProfileForm, AdminUpdateSeatForm, RatingForm, SearchForm, MovieFilterForm
 from .email import send_reset_password_email, send_cancellation_email, send_reservation_confirmation_email
 from flask_wtf import FlaskForm
 from datetime import datetime, timedelta
@@ -25,9 +26,9 @@ def generate_ticket_code(length=8):
 
 
 @app.route('/')
-@app.route('/index')
 def index():
-    return render_template('index.html')
+    recommended_movies = recommend_movies(current_user) if current_user.is_authenticated else []
+    return render_template('index.html', recommended_movies=recommended_movies)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -66,12 +67,24 @@ def register():
     return render_template('register.html', form=form)
 
 
-@app.route('/movies', methods=['GET'])
+@app.route('/movies', methods=['GET', 'POST'])
 @login_required
 def movies():
-    movies = Movie.query.all()
+    form = MovieFilterForm()
     form_csrf_token = generate_csrf()
-    return render_template('movies.html', movies=movies, form_csrf_token=form_csrf_token)
+    movies = Movie.query.all()
+
+    if form.validate_on_submit():
+        filters = []
+        if form.genre.data:
+            filters.append(Movie.genre == form.genre.data)
+        if form.director.data:
+            filters.append(Movie.director.ilike(f"%{form.director.data}%"))
+        if form.score.data:
+            filters.append(Movie.score >= form.score.data)
+        movies = Movie.query.filter(*filters).all()
+
+    return render_template('movies.html', movies=movies, form=form, form_csrf_token=form_csrf_token)
 
 @app.route('/add_movie', methods=['GET', 'POST'])
 @login_required
@@ -187,14 +200,22 @@ def make_reservation():
                     seat_obj = Seat(showtime_id=showtime.id, row=row, seat_number=seat_num, status='reserved')
                     db.session.add(seat_obj)
 
+            # Obliczanie punktów lojalnościowych
+            loyalty_points = calculate_loyalty_points(reservation)
+
+            # Aktualizacja punktów lojalnościowych użytkownika
+            if current_user.loyalty_points is None:
+                current_user.loyalty_points = 0
+            current_user.loyalty_points += loyalty_points
             db.session.commit()
+
             ticket_code = generate_ticket_code()
             send_reservation_confirmation_email(current_user, reservation, ticket_code)
             flash('Reservation made successfully! Check your email for the confirmation and ticket code.')
-            return redirect(url_for('index'))
+            return jsonify(success=True, message='Reservation made successfully! Check your email for the confirmation and ticket code.')
     except Exception as e:
         current_app.logger.error(f"Error making reservation: {e}")
-        flash('An error occurred while making the reservation.')
+        return jsonify(success=False, message='An error occurred while making the reservation.')
 
     showtime_id = form.showtime_id.data
     seats = Seat.query.filter_by(showtime_id=showtime_id).all()
@@ -310,7 +331,6 @@ def profile():
         flash('An error occurred while loading the profile.')
         return redirect(url_for('index'))
 
-
 @app.route('/cancel_reservation/<int:reservation_id>', methods=['POST'])
 @login_required
 def cancel_reservation(reservation_id):
@@ -398,3 +418,76 @@ def change_password():
         flash('Your password has been changed.')
         return redirect(url_for('profile'))
     return render_template('change_password.html', form=form)
+
+
+@app.route('/rate_movie/<int:movie_id>', methods=['GET', 'POST'])
+@login_required
+def rate_movie(movie_id):
+    form = RatingForm()
+    movie = Movie.query.get_or_404(movie_id)
+    if form.validate_on_submit():
+        existing_rating = Rating.query.filter_by(user_id=current_user.id, movie_id=movie_id).first()
+        if existing_rating:
+            existing_rating.score = form.score.data
+        else:
+            rating = Rating(user_id=current_user.id, movie_id=movie_id, score=form.score.data)
+            db.session.add(rating)
+        db.session.commit()
+        flash('Rating submitted successfully!', 'success')
+        return redirect(url_for('movie_details', movie_id=movie_id))
+    return render_template('rate_movie.html', form=form, movie=movie)
+
+@app.route('/recommendations')
+@login_required
+def recommendations():
+    user_ratings = Rating.query.filter_by(user_id=current_user.id).all()
+    rated_movie_ids = [r.movie_id for r in user_ratings]
+
+    # Find movies not yet rated by the user
+    unrated_movies = Movie.query.filter(~Movie.id.in_(rated_movie_ids)).all()
+
+    # Simple recommendation logic: recommend movies with the highest average rating
+    recommended_movies = sorted(unrated_movies, key=lambda m: m.rating or 0, reverse=True)[:5]
+
+    return render_template('recommendations.html', movies=recommended_movies)
+
+# routes.py
+@app.route('/search', methods=['GET', 'POST'])
+@login_required
+def search():
+    form = SearchForm()
+    movies = []
+    if form.validate_on_submit():
+        search_query = form.search.data
+        movies = Movie.query.filter(Movie.title.contains(search_query)).all()
+    return render_template('search.html', form=form, movies=movies)
+
+@app.route('/update_loyalty_points', methods=['POST'])
+@login_required
+def update_loyalty_points():
+    reservation_id = request.form.get('reservation_id')
+    reservation = Reservation.query.get(reservation_id)
+    if reservation and reservation.user_id == current_user.id:
+        points = calculate_loyalty_points(reservation)
+        loyalty = LoyaltyPoint.query.filter_by(user_id=current_user.id).first()
+        if not loyalty:
+            loyalty = LoyaltyPoint(user_id=current_user.id, points=points)
+            db.session.add(loyalty)
+        else:
+            loyalty.points += points
+        db.session.commit()
+        flash('Loyalty points updated.')
+    return redirect(url_for('profile'))
+
+@app.route('/movie/<int:movie_id>')
+def movie_details(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+    return render_template('movie_details.html', movie=movie)
+
+from flask import session, jsonify, request
+
+@app.route('/toggle_dark_mode', methods=['POST'])
+def toggle_dark_mode():
+    data = request.get_json()
+    session['dark_mode'] = data['dark_mode']
+    return jsonify(success=True)

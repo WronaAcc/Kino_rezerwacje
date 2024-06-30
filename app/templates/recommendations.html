@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Recommendations{% endblock %}
+
+{% block content %}
+<h1>Movie Recommendations</h1>
+{% for movie in movies %}
+<div class="movie">
+    <h2>{{ movie.title }} - {{ movie.genre }}</h2>
+    <p>
+        Release Date: {{ movie.release_date }}<br>
+        Description: {{ movie.description }}<br>
+        Average Rating: {{ movie.rating }}
+    </p>
+</div>
+<hr>
+{% endfor %}
+{% endblock %}

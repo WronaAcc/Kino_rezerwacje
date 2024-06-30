@@ -1,10 +1,4 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Profile</title>
-</head>
-<body>
+<!-- templates/profile.html -->
 {% extends "base.html" %}
 
 {% block title %}Profile{% endblock %}
@@ -13,45 +7,35 @@
 <h1>Profile</h1>
 <p>Username: {{ current_user.username }}</p>
 <p>Email: {{ current_user.email }}</p>
+<p>Loyalty Points: {{ current_user.loyalty_points }}</p>
 
-<h2>My Reservations</h2>
-<ul>
-  {% for reservation in active_reservations %}
-  <li>
-    {{ reservation.showtime.movie.title }} - {{ reservation.showtime.showtime }} - Seats: {{ reservation.seats }}
-    <form action="{{ url_for('cancel_reservation', reservation_id=reservation.id) }}" method="POST" style="display:inline;">
-      {{ form.hidden_tag() }}
-      <input type="submit" value="Cancel">
-    </form>
-  </li>
-  {% else %}
-  <li>No upcoming reservations.</li>
-  {% endfor %}
-</ul>
-
+<h2>Active Reservations</h2>
+{% for reservation in active_reservations %}
+<div class="reservation">
+  <p>Movie: {{ reservation.showtime.movie.title }}</p>
+  <p>Showtime: {{ reservation.showtime.showtime }}</p>
+  <form method="post" action="{{ url_for('cancel_reservation', reservation_id=reservation.id) }}" style="display:inline;">
+    {{ form.hidden_tag() }}
+    <input type="hidden" name="csrf_token" value="{{ form.csrf_token }}">
+    <button type="submit" class="cancel-button">Cancel Reservation</button>
+  </form>
+</div>
+{% endfor %}
 <h2>Past Reservations</h2>
-<ul>
-  {% for reservation in past_reservations %}
-  <li>
-    {{ reservation.showtime.movie.title }} - {{ reservation.showtime.showtime }} - Seats: {{ reservation.seats }}
-  </li>
-  {% else %}
-  <li>No past reservations.</li>
-  {% endfor %}
-</ul>
+{% for reservation in past_reservations %}
+<div class="reservation">
+  <p>Showtime: {{ reservation.showtime.showtime }}</p>
+  <p>Seats: {{ reservation.seats }}</p>
+</div>
+<hr>
+{% endfor %}
 
 <h2>Canceled Reservations</h2>
-<ul>
-  {% for reservation in canceled_reservations %}
-  <li>
-    {{ reservation.showtime.movie.title }} - {{ reservation.showtime.showtime }} - Seats: {{ reservation.seats }}
-  </li>
-  {% else %}
-  <li>No canceled reservations.</li>
-  {% endfor %}
-</ul>
-
-<p><a href="{{ url_for('change_password') }}">Change Password</a></p>
+{% for reservation in canceled_reservations %}
+<div class="reservation">
+  <p>Showtime: {{ reservation.showtime.showtime }}</p>
+  <p>Seats: {{ reservation.seats }}</p>
+</div>
+<hr>
+{% endfor %}
 {% endblock %}
-</body>
-</html>

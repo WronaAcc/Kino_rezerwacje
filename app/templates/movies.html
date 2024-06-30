@@ -4,6 +4,15 @@
 
 {% block content %}
 <h1>Movies</h1>
+<form method="GET" action="{{ url_for('movies') }}">
+    {{ form.hidden_tag() }}
+    <p>{{ form.title.label }}<br>{{ form.title() }}</p>
+    <p>{{ form.genre.label }}<br>{{ form.genre() }}</p>
+    <p>{{ form.release_date.label }}<br>{{ form.release_date() }}</p>
+    <p>{{ form.director.label }}<br>{{ form.director() }}</p>
+    <p>{{ form.score.label }}<br>{{ form.score() }}</p>
+    <p>{{ form.submit() }}</p>  <!-- Przycisk Filter -->
+</form>
 {% for movie in movies %}
 <div class="movie">
     <h2>{{ movie.title }} - {{ movie.genre }}</h2>
@@ -13,6 +22,7 @@
     </p>
     {% if current_user.is_admin %}
     <form method="post" action="{{ url_for('delete_movie', movie_id=movie.id) }}" style="display:inline;">
+        {{ form.hidden_tag() }}
         <input type="hidden" name="csrf_token" value="{{ form_csrf_token }}">
         <button type="submit" class="delete-button">Delete Movie</button>
     </form>
@@ -22,6 +32,7 @@
         <li>
             {{ showtime.showtime }}
             <form method="post" action="{{ url_for('delete_showtime', showtime_id=showtime.id) }}" style="display:inline;">
+                {{ form.hidden_tag() }}
                 <input type="hidden" name="csrf_token" value="{{ form_csrf_token }}">
                 <button type="submit" class="delete-button">Delete Showtime</button>
             </form>

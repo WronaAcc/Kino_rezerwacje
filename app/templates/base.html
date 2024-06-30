@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>{% block title %}Cinema Reservation System{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
 <header>
@@ -27,22 +28,23 @@
                 <li><a href="{{ url_for('login') }}">Login</a></li>
                 <li><a href="{{ url_for('register') }}">Register</a></li>
                 {% endif %}
+                <li>
+                    <div class="toggle-dark-mode">
+                        <div class="toggle-thumb"></div>
+                        <i class="fas fa-sun icon icon-day"></i>
+                        <i class="fas fa-moon icon icon-night"></i>
+                    </div>
+                </li>
             </ul>
         </div>
     </nav>
 </header>
 <main class="container">
-    <div class="ads">
-        <div class="ad-left">Miejsce na reklamę</div>
-        <div class="content">
-            {% block content %}{% endblock %}
-        </div>
-        <div class="ad-right">Miejsce na reklamę</div>
-    </div>
+    {% block content %}{% endblock %}
 </main>
 <footer>
     <p>&copy; 2024 Cinema Reservation System</p>
 </footer>
-<script src="{{ url_for('static', filename='scripts/seat_selection.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/dark_mode.js') }}"></script>
 </body>
 </html>

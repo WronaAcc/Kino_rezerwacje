@@ -1,0 +1,30 @@
+<!-- templates/search.html -->
+{% extends "base.html" %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+<h1>Search Movies</h1>
+<form method="POST" action="{{ url_for('search') }}">
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.search.label }}<br>
+    {{ form.search() }}
+  </p>
+  <button type="submit">Search</button>
+</form>
+{% if movies %}
+<h2>Search Results</h2>
+{% for movie in movies %}
+<div class="movie">
+  <h2>{{ movie.title }} - {{ movie.genre }}</h2>
+  <p>
+    Release Date: {{ movie.release_date }}<br>
+    Description: {{ movie.description }}<br>
+    Average Rating: {{ movie.rating }}
+  </p>
+</div>
+<hr>
+{% endfor %}
+{% endif %}
+{% endblock %}

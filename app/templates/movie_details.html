@@ -1,0 +1,21 @@
+<!-- movie_details.html -->
+{% extends "base.html" %}
+
+{% block title %}{{ movie.title }}{% endblock %}
+
+{% block content %}
+<div class="movie-details">
+    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster" class="movie-poster">
+    <h1>{{ movie.title }}</h1>
+    <p>
+        Release Date: {{ movie.release_date }}<br>
+        Genre: {{ movie.genre }}<br>
+        Director: {{ movie.director }}<br>
+        Description: {{ movie.description }}
+    </p>
+    <p>
+        Average Rating: {{ movie.average_rating() }}
+    </p>
+    <a href="{{ url_for('rate_movie', movie_id=movie.id) }}">Rate this movie</a>
+</div>
+{% endblock %}

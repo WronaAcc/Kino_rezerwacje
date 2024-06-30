@@ -255,6 +255,8 @@ form p select {
     border-radius: 5px;
     box-sizing: border-box;
     font-size: 1em;
+    background-color: #fff; /* Default for light mode */
+    color: #000;
 }
 
 form p textarea {
@@ -309,4 +311,240 @@ form button:hover {
 .error {
     color: red;
     font-size: 0.9em;
+}
+
+.thank-you-animation {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    z-index: 1000;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.thank-you-animation h2 {
+    margin-bottom: 10px;
+    color: #28a745;
+}
+
+.thank-you-animation p {
+    color: #333;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Nowe style dla szczegółów filmu */
+.movie-details {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.movie-details img.movie-poster {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 10px;
+}
+
+.movie-details h1 {
+    margin: 20px 0 10px;
+}
+
+.movie-details p {
+    color: #666;
+    line-height: 1.6;
+}
+
+/* Responsywność */
+@media (max-width: 600px) {
+    .movie-details {
+        padding: 10px;
+    }
+
+    .movie-details img.movie-poster {
+        max-width: 100%;
+    }
+}
+
+/* Styl dla trybu ciemnego */
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+.container.dark-mode {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+form p input.dark-mode,
+form p textarea.dark-mode,
+form p select.dark-mode {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+form p input:focus,
+form p textarea:focus,
+form p select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.dark-mode .navbar,
+.dark-mode footer,
+.dark-mode .ad-left,
+.dark-mode .ad-right {
+    background-color: #333;
+}
+
+.dark-mode .nav-links li a {
+    color: #ffffff;
+}
+
+.dark-mode .nav-links li a:hover {
+    color: #ff9800;
+}
+
+.dark-mode form p input,
+.dark-mode form p textarea,
+.dark-mode form p select {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+.dark-mode form p input:focus,
+.dark-mode form p textarea:focus,
+.dark-mode form p select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Ogólne style przycisku */
+.toggle-dark-mode {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 80px;
+    height: 40px;
+    background-color: #ccc;
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-thumb {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    background-color: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: left 0.3s ease, background-color 0.3s ease;
+}
+
+.icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2em;
+    transition: opacity 0.3s ease;
+}
+
+.icon-day {
+    left: 10px;
+    opacity: 0;
+}
+
+.icon-night {
+    right: 10px;
+    opacity: 1;
+}
+
+body, .container, form p input, form p textarea, form p select, .navbar, footer, .ad-left, .ad-right, .nav-links li a {
+    transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+}
+
+/* Wyłącz animację podczas inicjalizacji */
+body.no-transition, body.no-transition * {
+    transition: none !important;
+}
+
+/* Tryb ciemny */
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+.container.dark-mode {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+form p input,
+form p textarea,
+form p select {
+    background-color: white;
+    color: black;
+    border: 1px solid #ccc;
+}
+
+body.dark-mode form p input,
+body.dark-mode form p textarea,
+body.dark-mode form p select {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+.dark-mode .navbar,
+.dark-mode footer,
+.dark-mode .ad-left,
+.dark-mode .ad-right {
+    background-color: #333;
+}
+
+.dark-mode .nav-links li a {
+    color: #ffffff;
+}
+
+.dark-mode .nav-links li a:hover {
+    color: #ff9800;
+}
+
+.dark-mode .toggle-dark-mode {
+    background-color: #333;
+}
+
+.dark-mode .toggle-thumb {
+    left: 42px;
+    background-color: #444;
+}
+
+.dark-mode .icon-day {
+    opacity: 1;
+}
+
+.dark-mode .icon-night {
+    opacity: 0;
 }

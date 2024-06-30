@@ -1,0 +1,21 @@
+<!-- rate_movie.html -->
+{% extends "base.html" %}
+
+{% block title %}Rate {{ movie.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Rate {{ movie.title }}</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.score.label }}<br>
+            {{ form.score() }}<br>
+            {% for error in form.score.errors %}
+            <span class="error">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <button type="submit">{{ form.submit.label }}</button>
+    </form>
+</div>
+{% endblock %}
