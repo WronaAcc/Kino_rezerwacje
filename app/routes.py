@@ -446,7 +446,7 @@ def recommendations():
     # Find movies not yet rated by the user
     unrated_movies = Movie.query.filter(~Movie.id.in_(rated_movie_ids)).all()
 
-    # Simple recommendation logic: recommend movies with the highest average rating
+    # Recommend movies with the highest average rating
     recommended_movies = sorted(unrated_movies, key=lambda m: m.rating or 0, reverse=True)[:5]
 
     return render_template('recommendations.html', movies=recommended_movies)
